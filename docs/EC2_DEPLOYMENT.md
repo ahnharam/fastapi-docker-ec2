@@ -48,8 +48,12 @@ bash scripts/bootstrap_host.sh
 1. `/etc/os-release`로 Amazon Linux 2023 확인
 2. `dnf`로 Docker Engine과 Git 설치
 3. `sudo systemctl enable --now docker`
-4. Compose 플러그인 확인
-5. 플러그인이 없으면 공식 Docker Compose GitHub 릴리스에서 고정 버전 바이너리와
+4. Buildx 플러그인 버전 확인
+5. Compose가 요구하는 버전보다 낮으면 공식 Docker Buildx GitHub 릴리스에서 고정
+   버전 바이너리와 `checksums.txt`를 HTTPS로 내려받아 검증한 후 시스템 플러그인
+   경로에 설치
+6. Compose 플러그인 확인
+7. 플러그인이 없으면 공식 Docker Compose GitHub 릴리스에서 고정 버전 바이너리와
    `.sha256` 파일을 HTTPS로 내려받고 검증한 후
    `/usr/local/lib/docker/cli-plugins/docker-compose`에 설치
 
@@ -60,6 +64,7 @@ Docker 그룹에는 사용자를 추가하지 않습니다. Docker socket 권한
 
 ```bash
 sudo docker version
+sudo docker buildx version
 sudo docker compose version
 git --version
 ```

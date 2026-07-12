@@ -116,6 +116,8 @@ bash scripts/deploy_ec2.sh
 - 실행 OS가 Amazon Linux 2023인지 확인
 - Amazon Linux 저장소에서 Docker Engine과 Git 설치
 - `systemctl enable --now docker`
+- 기본 Buildx가 Compose 요구 버전보다 낮으면 공식 Docker Buildx 릴리스를 다운로드하고
+  제공된 SHA-256 체크섬과 대조한 뒤 시스템 플러그인 경로에 설치
 - `docker compose`가 없으면 공식 Docker Compose 릴리스의 플러그인을 다운로드하고
   제공된 SHA-256과 대조한 뒤 시스템 플러그인 경로에 설치
 
