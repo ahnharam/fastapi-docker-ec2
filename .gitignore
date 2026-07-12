@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+secrets.toml
+
+# SSH and cloud credentials
+*.pem
+*.ppk
+*.key
+id_rsa
+id_ed25519
+.aws/
+
+# Local Docker overrides and generated data
+docker-compose.override.yml
+courses.local.json
+
+# IDE, OS, logs, and output
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.log
+output/

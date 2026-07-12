@@ -1,0 +1,86 @@
+name: tests-and-container
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  python-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install test dependencies
+        run: python -m pip install -r requirements-dev.txt
+
+      - name: Run tests
+        run: python -m pytest -q
+
+  docker-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Validate Compose file
+        run: docker compose --file docker-compose.yml config --quiet
+
+      - name: Build image
+        run: docker build --tag fastapi-courses-api:ci .
+
+      - name: Run and verify container
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          container_name="fastapi-courses-api-ci-${GITHUB_RUN_ID}"
+          docker run --detach \
+            --name "${container_name}" \
+            --publish 127.0.0.1:18080:8000 \
+            fastapi-courses-api:ci
+          trap 'docker rm --force "${container_name}" >/dev/null 2>&1 || true' EXIT
+
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:18080/health >/dev/null; then
+              break
+            fi
+            if [[ "${attempt}" -eq 30 ]]; then
+              docker logs "${container_name}"
+              exit 1
+            fi
+            sleep 1
+          done
+
+          test "$(docker inspect --format '{{.Config.User}}' "${container_name}")" = "10001:10001"
+          curl --fail --silent http://127.0.0.1:18080/courses | grep -F 'course_name'
+
+          curl --fail --silent --request POST \
+            --header 'Content-Type: application/json' \
+            --data '{"course_name":"CI persistence","year":"2026","semester":"test","grade":"P"}' \
+            http://127.0.0.1:18080/courses | grep -F 'CI persistence'
+
+          docker restart "${container_name}"
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:18080/courses | grep -F 'CI persistence'; then
+              break
+            fi
+            if [[ "${attempt}" -eq 30 ]]; then
+              docker logs "${container_name}"
+              exit 1
+            fi
+            sleep 1
+          done

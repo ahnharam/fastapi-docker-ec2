@@ -1,0 +1,20 @@
+[
+  {
+    "course_name": "오픈소스소프트웨어실습",
+    "year": "2026",
+    "semester": "1학기",
+    "grade": "A+"
+  },
+  {
+    "course_name": "웹프로그래밍",
+    "year": "2026",
+    "semester": "1학기",
+    "grade": "A0"
+  },
+  {
+    "course_name": "클라우드컴퓨팅",
+    "year": "2025",
+    "semester": "2학기",
+    "grade": "B+"
+  }
+]
